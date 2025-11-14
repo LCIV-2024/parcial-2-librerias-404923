@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -158,7 +159,7 @@ public class ReservationService {
     }
     
     private BigDecimal calculateLateFee(BigDecimal bookPrice, long daysLate) {
-        return bookPrice.multiply(BigDecimal.valueOf(daysLate).multiply(LATE_FEE_PERCENTAGE).setScale(2));
+        return bookPrice.multiply(BigDecimal.valueOf(daysLate).multiply(LATE_FEE_PERCENTAGE).setScale(2, RoundingMode.HALF_UP));
     }
     
     private ReservationResponseDTO convertToDTO(Reservation reservation) {

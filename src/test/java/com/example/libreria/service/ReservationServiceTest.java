@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -91,14 +92,7 @@ class ReservationServiceTest {
             throw new RuntimeException("El usuario no existe");
         }
 
-        User user = new User();
-        user.setId(dto.getId());
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPhoneNumber(dto.getPhoneNumber());
-
-
-        when(userService.getUserById(1L)).thenReturn(user);
+        when(userService.getUserById(1L)).thenReturn(dto);
         when(bookRepository.findById(258027L)).thenReturn(Optional.of(testBook));
         when(reservationRepository.save(any(Reservation.class))).thenAnswer(invocation -> {
             Reservation r = invocation.getArgument(0);
@@ -145,7 +139,7 @@ class ReservationServiceTest {
             reservationService.createReservation(requestDTO);
         });
 
-        assertTrue(ex.getMessage().contains("No hay stock disponible"));
+        assertTrue(ex.getMessage().contains("El libro está agotado"));
     }
 
 
@@ -192,7 +186,7 @@ class ReservationServiceTest {
         assertNotNull(result);
         assertEquals(Reservation.ReservationStatus.OVERDUE, result.getStatus());
 
-        assertEquals(new BigDecimal("7.20"), result.getLateFee().setScale(2));
+        assertEquals(new BigDecimal("7.20"), result.getLateFee().setScale(2, RoundingMode.HALF_UP));
 
         assertEquals(6, testBook.getAvailableQuantity());
     }
