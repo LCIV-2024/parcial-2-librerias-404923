@@ -1,1 +1,11 @@
-# // TODO: Implementar el docker-compose
+version: "3.9"
+
+services:
+  libreria-api:
+    build: .
+    container_name: libreria-api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
